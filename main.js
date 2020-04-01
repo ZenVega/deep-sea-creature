@@ -43,13 +43,30 @@ const creature = {
     for (let i in match) {
       if(match[i]) {hits.push(i)}
     }
-    console.log(`Specimen #${this.specimenNum} and Specimen #${pAequor.specimenNum} have ${percentage.toFixed(2)}% DNA in common`);
+    return percentage.toFixed(2);
+//    console.log(`Specimen #${this.specimenNum} and Specimen #${pAequor.specimenNum} have ${percentage.toFixed(2)}% DNA in common`);
   },
   willLikelySurvive() {
     let cgBases = this.dna.reduce((acc, toSum) => {
       if(toSum == 'C' || toSum == 'G') {acc += 1}return acc}, 0);
     let percentage = cgBases/15*100;
     if(percentage >= 60) {return true} else {return false};
+  },
+  complementStrand()  {
+    let cStrand = this.dna.reduce((acc, base) => {
+      switch(base) {
+        case 'C': acc.push('G');
+        break;
+        case 'G': acc.push('C');
+        break;
+        case 'A': acc.push('T');
+        break;
+        case 'T': acc.push('A');
+        break;
+      }
+      return acc;
+    },[])
+    return cStrand;
   },
 }
 creatureArr.push(creature);
@@ -80,8 +97,23 @@ creatureArr[1].compareDNA(creatureArr[2])
 
 // check for individuals to survive
 console.log(creatureArr);
-
 console.log(survivors);
+console.log(`The Specimen with the numbers :${survivorNums.join(' /')} will likely survive`);
 
-console.log(`The Specimen with the numbers :${survivorNums.join(' /')} will likely survive`)
+// find the two most related
+let highestP = 0;
+let perfectMatch = creatureArr.reduce((match, curV) => {
 
+  for (let i in creatureArr){
+    let comP = curV.compareDNA(creatureArr[i]);
+      if(highestP < comP) {
+        highestP = comP;
+        match = {
+          specimen_no1 : curV.specimenNum,
+          specimen_no2 : creatureArr[i].specimenNum,
+          matchInPercent : highestP
+        }
+      }
+  }return match;
+}, [])
+console.log(perfectMatch);
